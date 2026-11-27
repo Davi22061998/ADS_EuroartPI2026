@@ -35,6 +35,8 @@ function carregarMenu(itemAtivoId) {
                 ${menuAdminHTML}
             </ul>
 
+            <button type="button" class="theme-toggle" data-theme-toggle onclick="alternarTema()"><i class="fas fa-moon" aria-hidden="true"></i><span>Modo escuro</span></button>
+
             <button class="logout-btn" onclick="fazerLogout()">
                 <i class="fas fa-sign-out-alt"></i> Sair
             </button>
@@ -50,8 +52,10 @@ function carregarMenu(itemAtivoId) {
 
     if (itemAtivoId) {
         const itemAtivo = document.getElementById(itemAtivoId);
-        if (itemAtivo) {
-            itemAtivo.classList.add('active');
-        }
+        if (itemAtivo) itemAtivo.classList.add('active');
+    }
+
+    if (typeof window.atualizarBotoesTema === 'function') {
+        window.atualizarBotoesTema(document.documentElement.getAttribute('data-theme') || 'light');
     }
 }
