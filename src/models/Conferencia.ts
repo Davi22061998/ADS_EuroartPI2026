@@ -1,53 +1,43 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/database";
-import Usuario from "./Usuario";
+import { DataTypes, Model, Optional } from 'sequelize';
+import sequelize from '../config/database';
+import Usuario from './Usuario';
 
 export interface ConferenciaAttributes {
   id: number;
   transportadora: string;
-  status: "em_andamento" | "interrompida" | "finalizada";
+  status: 'em_andamento' | 'interrompida' | 'finalizada';
   usuario_id: number;
   data_inicio: Date;
   data_finalizacao?: Date;
 }
 
-export interface ConferenciaCreationAttributes extends Optional<
-  ConferenciaAttributes,
-  "id" | "data_inicio" | "data_finalizacao"
-> {}
+export interface ConferenciaCreationAttributes extends Optional<ConferenciaAttributes, 'id' | 'data_inicio' | 'data_finalizacao'> {}
 
-export class Conferencia
-  extends Model<ConferenciaAttributes, ConferenciaCreationAttributes>
-  implements ConferenciaAttributes
-{
-  declare public id: number;
-  declare public transportadora: string;
-  declare public status: "em_andamento" | "interrompida" | "finalizada";
-  declare public usuario_id: number;
-  declare public data_inicio: Date;
-  declare public data_finalizacao?: Date;
+export class Conferencia extends Model<ConferenciaAttributes, ConferenciaCreationAttributes> implements ConferenciaAttributes {
+  public declare id: number;
+  public declare transportadora: string;
+  public declare status: 'em_andamento' | 'interrompida' | 'finalizada';
+  public declare usuario_id: number;
+  public declare data_inicio: Date;
+  public declare data_finalizacao?: Date;
 }
 
 Conferencia.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     transportadora: { type: DataTypes.STRING(150), allowNull: false },
-    status: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      defaultValue: "em_andamento",
-    },
+    status: { type: DataTypes.STRING(50), allowNull: false, defaultValue: 'em_andamento' },
     usuario_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: "usuarios", key: "id" },
+      references: { model: 'usuarios', key: 'id' }
     },
     data_inicio: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    data_finalizacao: { type: DataTypes.DATE, allowNull: true },
+    data_finalizacao: { type: DataTypes.DATE, allowNull: true }
   },
-  { sequelize, tableName: "conferencias", timestamps: false },
+  { sequelize, tableName: 'conferencias', timestamps: false }
 );
 
-Conferencia.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
+Conferencia.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
 
 export default Conferencia;
