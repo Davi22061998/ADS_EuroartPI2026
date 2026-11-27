@@ -1,9 +1,9 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/database";
-import Conferencia from "./Conferencia";
-import Remessa from "./Remessa";
-import CaixaEmbalagem from "./CaixaEmbalagem";
-import Usuario from "./Usuario";
+import { DataTypes, Model, Optional } from 'sequelize';
+import sequelize from '../config/database';
+import Conferencia from './Conferencia';
+import Remessa from './Remessa';
+import CaixaEmbalagem from './CaixaEmbalagem';
+import Usuario from './Usuario';
 
 export interface PacoteAttributes {
   id: number;
@@ -14,13 +14,7 @@ export interface PacoteAttributes {
   razao_social?: string;
   descricao_produto?: string;
   uf: string;
-  status:
-    | "pendente"
-    | "ok"
-    | "divergente_peso"
-    | "bloqueado"
-    | "liberado_divergente"
-    | "duplicado";
+  status: 'pendente' | 'ok' | 'divergente_peso' | 'bloqueado' | 'bloqueado_aprovacao' | 'cancelado' | 'liberado_divergente' | 'duplicado';
   possui_guia_icms: boolean;
   caixa_id?: number | null;
   peso_esperado_g?: number | null;
@@ -31,38 +25,26 @@ export interface PacoteAttributes {
   data_conferido?: Date | null;
 }
 
-export interface PacoteCreationAttributes extends Optional<
-  PacoteAttributes,
-  "id" | "status" | "possui_guia_icms" | "tentativas_peso"
-> {}
+export interface PacoteCreationAttributes extends Optional<PacoteAttributes, 'id' | 'status' | 'possui_guia_icms' | 'tentativas_peso'> {}
 
-export class Pacote
-  extends Model<PacoteAttributes, PacoteCreationAttributes>
-  implements PacoteAttributes
-{
-  declare public id: number;
-  declare public conferencia_id: number;
-  declare public remessa_id: number;
-  declare public chave_acesso: string;
-  declare public numero_nf: string;
-  declare public razao_social?: string;
-  declare public descricao_produto?: string;
-  declare public uf: string;
-  declare public status:
-    | "pendente"
-    | "ok"
-    | "divergente_peso"
-    | "bloqueado"
-    | "liberado_divergente"
-    | "duplicado";
-  declare public possui_guia_icms: boolean;
-  declare public caixa_id?: number | null;
-  declare public peso_esperado_g?: number | null;
-  declare public peso_lido_g?: number | null;
-  declare public tentativas_peso: number;
-  declare public justificativa_liberacao?: string | null;
-  declare public usuario_liberacao_id?: number | null;
-  declare public data_conferido?: Date | null;
+export class Pacote extends Model<PacoteAttributes, PacoteCreationAttributes> implements PacoteAttributes {
+  public declare id: number;
+  public declare conferencia_id: number;
+  public declare remessa_id: number;
+  public declare chave_acesso: string;
+  public declare numero_nf: string;
+  public declare razao_social?: string;
+  public declare descricao_produto?: string;
+  public declare uf: string;
+  public declare status: 'pendente' | 'ok' | 'divergente_peso' | 'bloqueado' | 'bloqueado_aprovacao' | 'cancelado' | 'liberado_divergente' | 'duplicado';
+  public declare possui_guia_icms: boolean;
+  public declare caixa_id?: number | null;
+  public declare peso_esperado_g?: number | null;
+  public declare peso_lido_g?: number | null;
+  public declare tentativas_peso: number;
+  public declare justificativa_liberacao?: string | null;
+  public declare usuario_liberacao_id?: number | null;
+  public declare data_conferido?: Date | null;
 }
 
 Pacote.init(
@@ -71,74 +53,49 @@ Pacote.init(
     conferencia_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: "conferencias", key: "id" },
+      references: { model: 'conferencias', key: 'id' }
     },
     remessa_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: "remessas", key: "id" },
+      references: { model: 'remessas', key: 'id' }
     },
-    chave_acesso: {
-      type: DataTypes.STRING(44),
-      allowNull: false,
-      unique: true,
-    },
+    chave_acesso: { type: DataTypes.STRING(44), allowNull: false, unique: true },
     numero_nf: { type: DataTypes.STRING(20), allowNull: false },
     razao_social: { type: DataTypes.STRING(255), allowNull: true },
     descricao_produto: { type: DataTypes.STRING(255), allowNull: true },
     uf: { type: DataTypes.CHAR(2), allowNull: false },
-    status: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      defaultValue: "pendente",
-    },
-    possui_guia_icms: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+    status: { type: DataTypes.STRING(50), allowNull: false, defaultValue: 'pendente' },
+    possui_guia_icms: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     caixa_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: { model: "caixas_embalagem", key: "id" },
+      references: { model: 'caixas_embalagem', key: 'id' }
     },
     peso_esperado_g: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
     peso_lido_g: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
-    tentativas_peso: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    },
+    tentativas_peso: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     justificativa_liberacao: { type: DataTypes.TEXT, allowNull: true },
     usuario_liberacao_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: { model: "usuarios", key: "id" },
+      references: { model: 'usuarios', key: 'id' }
     },
-    data_conferido: { type: DataTypes.DATE, allowNull: true },
+    data_conferido: { type: DataTypes.DATE, allowNull: true }
   },
-  { sequelize, tableName: "pacotes", timestamps: false },
+  { sequelize, tableName: 'pacotes', timestamps: false }
 );
 
-Conferencia.hasMany(Pacote, { foreignKey: "conferencia_id", as: "pacotes" });
-Pacote.belongsTo(Conferencia, {
-  foreignKey: "conferencia_id",
-  as: "conferencia",
-});
+Conferencia.hasMany(Pacote, { foreignKey: 'conferencia_id', as: 'pacotes' });
+Pacote.belongsTo(Conferencia, { foreignKey: 'conferencia_id', as: 'conferencia' });
 
-Remessa.hasMany(Pacote, { foreignKey: "remessa_id", as: "pacotes" });
-Pacote.belongsTo(Remessa, { foreignKey: "remessa_id", as: "remessa" });
+Remessa.hasMany(Pacote, { foreignKey: 'remessa_id', as: 'pacotes' });
+Pacote.belongsTo(Remessa, { foreignKey: 'remessa_id', as: 'remessa' });
 
-CaixaEmbalagem.hasMany(Pacote, { foreignKey: "caixa_id", as: "pacotes" });
-Pacote.belongsTo(CaixaEmbalagem, { foreignKey: "caixa_id", as: "caixa" });
+CaixaEmbalagem.hasMany(Pacote, { foreignKey: 'caixa_id', as: 'pacotes' });
+Pacote.belongsTo(CaixaEmbalagem, { foreignKey: 'caixa_id', as: 'caixa' });
 
-Usuario.hasMany(Pacote, {
-  foreignKey: "usuario_liberacao_id",
-  as: "pacotes_liberados",
-});
-Pacote.belongsTo(Usuario, {
-  foreignKey: "usuario_liberacao_id",
-  as: "usuario_liberacao",
-});
+Usuario.hasMany(Pacote, { foreignKey: 'usuario_liberacao_id', as: 'pacotes_liberados' });
+Pacote.belongsTo(Usuario, { foreignKey: 'usuario_liberacao_id', as: 'usuario_liberacao' });
 
 export default Pacote;
